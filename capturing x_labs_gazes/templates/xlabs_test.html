@@ -1,0 +1,98 @@
+<html>
+ <body>
+    <h1>Programing for business analytics: Capturing gazes</h1>
+    <p>This demo will capture gazes behind the scenes and create a log of the coordinates that will be useful for posterior analysis with AI models.</p>
+    <p style=" color: red">Troubleshooting: you need to enable "Allow access to file URLs" for the xlabs plugin in the chrome extension settings.</p>
+    <p style=" color: red">Note: Webcam access doesn't work from file:// URLs. See:
+    http://stackoverflow.com/questions/13723699/chrome-getusermedia-not-requesting-permission-locally </p>
+    <p style=" color: red">You can run Chrome with --allow-file-access-from-files to allow this, or run a local webserver.</p>
+    <h2>Capturing logs and enabling frames processing</h2>
+    <button id="camera-start">Start camera</button>
+    <button id="camera-stop">Stop camera</button>
+    <p id="gLog" style=" color: green;" >That's what you having gazing</p>
+    <form id="gaze_form" action="{{ url_for('save_to_csv') }}" method="post">
+        <textarea id="gazeLogs" name="gazeLogs" rows="30" cols="100">
+        Here will come gaze logs...
+        </textarea>
+        <br/>
+        <button type="button" id="refresh">Refresh</button>
+        <button type="submit" id="submit_logs">Submit</button>
+    </form>
+     
+     <script src="/api/xlabs.js" type="text/javascript"></script>
+     <script type="text/javascript">
+        var Demo = {
+            cameraStart : function() {
+                xLabs.setConfig( "frame.stream.enabled", "1" );
+                xLabs.setConfig( "system.mode", "learning" );
+            },
+            cameraStop : function() {
+                xLabs.setConfig( "frame.stream.enabled", "0" );
+                xLabs.setConfig( "system.mode", "off" );
+            },
+            ready : function() {
+                xLabs.setConfig( "gaze.temp.enabled", "1" );
+                xLabs.setConfig( "system.mode", "off" );
+                xLabs.setConfig( "browser.canvas.paintLearning", "0" );
+            },
+            idPath : function( id, path ) {
+              console.log( "id="+id+" path="+path );
+              if (id == "gazeLogs"){
+                alert( "DOM updated element "+id+" with xLabs CSV data from "+path );
+              }
+            },            
+            update : function() {
+              // Nothing.
+            },
+            refresh : function() {
+                xLabs.setConfig( "gaze.temp.id", "gazeLogs" );
+            }
+        };
+
+        var buttons = document.querySelectorAll( 'button' );
+        [].forEach.call( buttons, function( button ) {
+          button.addEventListener( 'click', function( e ) {
+           switch( e.target.id ) {
+            case 'camera-start' : Demo.cameraStart(); break;
+            case 'camera-stop' : Demo.cameraStop(); break;
+           }
+          } );
+        } );
+
+        /*
+        function submit_handler() {
+            alert("Submission validation");
+            gaze_logs = document.getElementById("gazeLogs");
+            if (gaze_logs=="Here will come gaze logs...")
+                return false;
+            else{
+                alert("Submit the form");
+                return true;
+            }
+        }*/
+         
+        function onXlabsUpdate() {
+            /*
+            var xs = parseFloat( xLabs.getConfig( "state.gaze.estimate.x" ) );
+            var ys = parseFloat( xLabs.getConfig( "state.gaze.estimate.y" ) );        
+            if( !xLabs.documentOffsetReady() ) {
+                return;
+            }
+            
+            var trackingSuspended = parseInt( xLabs.getConfig( "state.trackingSuspended" ) );
+            var calibrationStatus = parseInt( xLabs.getConfig( "calibration.status" ) );
+            if( ( calibrationStatus == 0 ) || ( trackingSuspended == 1 ) ) {
+                return;
+            }            
+            var x = xLabs.scr2docX( xs );
+            var y = xLabs.scr2docY( ys );
+            var c = parseFloat( xLabs.getConfig( "state.calibration.confidence" ) );
+            */
+        }
+
+        xLabs.setup( Demo.ready, Demo.update, Demo.idPath, "a59f7e14-518a-4c2f-8ee9-3180cbcfb817");
+        document.getElementById("refresh").onclick = Demo.refresh;
+        //document.getElementById("gaze_values").submit = submit_handler;
+    </script>
+ </body>
+</html>

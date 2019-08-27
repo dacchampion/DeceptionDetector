@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>P4BA App</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
+    <!-- BOOTSTRAP -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+    integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    
+    <!-- VARIABLES -->
+    <script type="text/javascript" src="{{url_for('static', filename='variables.js')}}"></script>
+    <script>
+        var myQuestions = {{ questions|tojson }};
+    </script>
+    
+    <!-- AFFECTIVA -->
+    <script type="text/javascript" src="{{url_for('static', filename='affdex/affdex.js')}}"></script>
+    
+    <!-- XLABS -->
+    <script type="text/javascript" src="{{url_for('static', filename='xlabs/xlabs.js')}}"></script>
+    
+    <!-- SURVEYJS -->
+    <script src="https://unpkg.com/jquery"></script>
+    <script src="https://surveyjs.azureedge.net/0.96.0/survey.jquery.js"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='surveysjs/index.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='surveysjs/timer.css')}}">
+    
+    <!--
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    -->
+</head>
+<body>
+    <div class="jumbotron text-center" style="background-color:#21618C;">
+        <div class="container">
+            <h1 style="color:#FFFFFF;">Try to fool an AI Lie Detector!</h1>
+        </div>
+    </div>
+    
+    <form id="app_form" method="post" action="/results">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Camera -->
+            <div class="col-md-3">
+                <div>
+                    <h5>CAMERA</h5>
+                    <div id="affdex_elements" style="width:220px;height:170px;"></div>
+                </div>
+                <div class="btn-group btn-group" style="display:none;">
+                    <button id="btn_camera_start" type="button" class="btn btn-success" style="min-width:100px;" onclick="camera_start()">Start</button>
+                    <button id="btn_camera_stop"  type="button" class="btn btn-danger"  style="min-width:100px;" onclick="camera_stop()">Stop</button>
+                    <!--<button id="btn_camera_reset" onclick="onReset()">Reset</button>-->
+                </div>
+                <div style="display:none;">
+                    <div style="height:30px"></div>
+                    <h5>CAMERA LOG</h5>
+                    <div id="camera_log"></div>
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="col-md-6">
+                <div id="surveyIni" style="padding:0px 50px;">
+                    <p>
+                        You will be presented with 3 simple questions.<br />
+                        Answer 2 of them with the truth and 1 with a lie.<br />
+                        <br />
+                        You will have 3 seconds to read the question.<br />
+                        And only 10 seconds to answer. <br />
+                        <br />
+                        After you finish, the algorithm will try to guess in which question you lied. <br />
+                        <br />
+                    <h4>Do you really think that you can fool an AI lie detector? </h4>
+                    </p>
+                    <div style="height:30px"></div>
+                    <button id="btn_camera_initialize" type="button" class="btn btn-success" style="min-width:200px;" onclick="camera_initialize()">Initialize camera</button>
+                    </p>
+                    <button id="btn_survey_start" type="button" class="btn btn-primary" style="min-width:200px;" onclick="survey_start()" disabled>Give it a try !</button>
+                </div>
+                <div id="surveyElement"></div>
+                <div id="surveyResult"></div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Affdex Results -->
+            <div id="div_aff" class="col-md-6" style="min-height:100px;background-color:#00FF00;display:none;">
+                <div class="col-md-6">
+                    <div class="row">
+                        <h5>EMOTION TRACKING RESULTS</h5>
+                    </div>
+                    <div class="row" >
+                        <div class="col-md-4" id="aff_res1" style="word-wrap:break-word;"></div>
+                        <div class="col-md-4" id="aff_res2" style="word-wrap:break-word;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logs -->
+            <div id="div_log" class="col-md-6" style="min-height:100px;background-color:#FFFF00;display:none;">
+                <div class="col-md-6">
+                    <div class="row">
+                        <h5>TRACKING LOG</h5>
+                    </div>
+                    <div class="row">
+                        <textarea id="log_events" name="log_events" rows="3" cols="100"></textarea>
+                    </div>
+                    <div class="row">
+                        <textarea id="log_affdex" name="log_affdex" rows="3" cols="100"></textarea>
+                    </div>
+                    <div class="row">
+                        <textarea id="log_xlabs" name="log_xlabs" rows="3" cols="100"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    </div>
+    </form>
+    
+    <!--
+    <footer class="container-fluid">
+        <p>Footer Text</p>
+    </footer>
+    -->
+    
+    <!-- GENERAL -->
+    <script type="text/javascript" src="{{url_for('static', filename='scripts/script_general.js')}}"></script>
+    
+    <!-- AFFECTIVA -->
+    <script type="text/javascript" src="{{url_for('static', filename='scripts/script_affdex.js')}}"></script>
+    
+    <!-- XLABS -->
+    <script type="text/javascript" src="{{url_for('static', filename='scripts/script_xlabs.js')}}"></script>
+    
+    <!-- SURVEYJS -->
+    <script type="text/javascript" src="{{url_for('static', filename='scripts/script_surveysjs.js')}}"></script>   
+</body>
+</html>

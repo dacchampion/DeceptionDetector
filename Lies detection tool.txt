@@ -1,0 +1,79 @@
+title Lies detection tool
+
+actor User
+participant Browser
+participant xLabs
+participant Affectiva
+participant WebApp
+database LieDetectorStorage
+participant Model
+
+User->Browser:Ask for initial page
+activate Browser
+Browser->WebApp:Request '/' resources
+activate WebApp
+Browser<--WebApp:Dispatch static and dynamicly generated content
+User<--Browser:Initial page with instructions
+User->Browser:Click 'Initialize Camera' button
+activate Browser
+parallel
+note left of Browser: Load components
+Browser->xLabs:
+activate xLabs
+Browser->Affectiva:
+activate Affectiva
+parallel off
+User<--Browser:Start capturing video
+deactivate Browser
+par Tracking user
+xLabs-->Browser:Send calibration signals
+Browser-->User:Display calibration signals
+Affectiva-->Browser:Ask for video frames
+parallel
+note left of Browser:Send video frames
+Browser->xLabs:
+Browser->Affectiva:
+parallel off
+end
+Browser->Browser:Disable 'Initialize Camera'
+User<--Browser:Enable button 'Give it a try!'
+User->Browser:Click 'Give it a try Button!'
+loop question<=3
+User<--Browser:Show question
+Browser->Browser:Wait for 3 seconds
+parallel 
+User->Browser:Answer question
+Browser->Browser:Wait for 10 seconds
+parallel off
+end
+parallel
+note left of Browser:Inactivate tracking components
+Browser->xLabs:
+Browser->Affectiva:
+deactivate xLabs
+deactivate Affectiva
+parallel off
+User<--Browser:Show 'Waiting for prediction message
+Browser->Browser:Wait for some seconds
+Browser->WebApp:Send form with hidden fields
+WebApp->LieDetectorStorage:Send raw inputs for prediction
+LieDetectorStorage->LieDetectorStorage:Preproces any raw input
+LieDetectorStorage->LieDetectorStorage:Update database with processed input
+LieDetectorStorage->Model:Predict this features
+LieDetectorStorage<--Model:Return estimated lying score
+WebApp<--LieDetectorStorage:Inform updated status
+Browser<--WebApp:Return page with information about accuracy and feedback
+User<--Browser:Display results page asking for user feedback
+User->Browser:Respond with feedback
+User<--Browser:Display cheers page
+Browser->WebApp:Send form with user feedback
+WebApp->LieDetectorStorage:Send user feedback to be stored
+WebApp<--LieDetectorStorage:Update response
+deactivate WebApp
+par train
+LieDetectorStorage->LieDetectorStorage:Recover records for training
+LieDetectorStorage->Model:Send training dataset
+activate Model
+LieDetectorStorage<--Model:Confirm retrain status
+deactivate Model
+end 

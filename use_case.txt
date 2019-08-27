@@ -1,0 +1,3 @@
+https://yuml.me/edit/92eeca90
+
+[User]-(Install xLabs extension), [User]-(Initialize Camera), [User]-(Answer complicated questionnaire), [User]-(Give prediction feedback), (Answer complicated questionnaire)>(Store user tracking), (Give prediction feedback)>(Predict emotional features), (Predict emotional features)<(Retrain predicting model)
