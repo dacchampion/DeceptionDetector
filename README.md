@@ -15,3 +15,5 @@ Following is the description of different folders:
 * Templates: Flask html templates
 
 There are some additional files, like use case and sequence diagrams and different flask project starting points.
+
+__Project paper is added to the repository, file name is AILieDetector.pdf__
